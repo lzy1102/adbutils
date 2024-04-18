@@ -1,7 +1,6 @@
 package adbutils
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	_ "github.com/lzy1102/adbutils/binaries"
@@ -177,24 +176,31 @@ func (adbConnection AdbConnection) Read(n int) []byte {
 }
 
 func (adbConnection AdbConnection) readFully(n int) []byte {
-	t := 0
+	//t := 0
+	//buffer := make([]byte, n)
+	//result := bytes.NewBuffer(nil)
+	//for t < n {
+	//	length, err := adbConnection.Conn.Read(buffer[0:n])
+	//	if err != nil {
+	//		if err == io.EOF {
+	//			break
+	//		}
+	//		break
+	//	}
+	//	if length == 0 {
+	//		break
+	//	}
+	//	result.Write(buffer[0:length])
+	//	t += length
+	//}
+	//return result.Bytes()
 	buffer := make([]byte, n)
-	result := bytes.NewBuffer(nil)
-	for t < n {
-		length, err := adbConnection.Conn.Read(buffer[0:n])
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			break
-		}
-		if length == 0 {
-			break
-		}
-		result.Write(buffer[0:length])
-		t += length
+
+	_, err := io.ReadFull(adbConnection.Conn, buffer)
+	if err != nil {
+		return nil
 	}
-	return result.Bytes()
+	return buffer
 }
 
 func (adbConnection AdbConnection) SendCommand(cmd string) {
