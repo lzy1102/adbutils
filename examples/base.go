@@ -1,13 +1,15 @@
-/**
+/*
+*
 Test localhost Only one Device
-**/
+*
+*/
 package main
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/xmsociety/adbutils"
+	"github.com/lzy1102/adbutils"
 )
 
 func GetServerVersion() {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net"
 	"os"
@@ -113,7 +113,7 @@ func (mixin ShellMixin) GetProp(prop string) string {
 }
 
 func (mixin ShellMixin) ListPackages() []string {
-	result := []string{}
+	var result []string
 	res := mixin.run("pm list packages")
 	output := res.(string)
 	for _, packageName := range strings.Split(output, "\n") {
@@ -279,12 +279,12 @@ func (adbDevice AdbDevice) AdbOut(command string) string {
 		log.Println(err.Error())
 		return ""
 	}
-	bytesOut, err := ioutil.ReadAll(stdOut)
+	bytesOut, err := io.ReadAll(stdOut)
 	if err != nil {
 		log.Println(err.Error())
 		return ""
 	}
-	bytesErr, err := ioutil.ReadAll(stdErr)
+	bytesErr, err := io.ReadAll(stdErr)
 	if err != nil {
 		log.Println(err.Error())
 		return ""
@@ -305,6 +305,45 @@ func (adbDevice AdbDevice) Shell(cmdargs string, stream bool, timeOut time.Durat
 	output := c.ReadUntilClose()
 	// 简单返回
 	return output
+}
+
+func (adbDevice AdbDevice) StartTCPIP(port string) string {
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	commandWithPrefix := "-s " + adbDevice.Serial + " " + "tcpip" + " " + port
+	cmd := exec.CommandContext(ctx, AdbPath(), strings.Split(commandWithPrefix, " ")...)
+	stdErr, err := cmd.StderrPipe()
+	stdOut, err := cmd.StdoutPipe()
+
+	defer func() {
+		cancelFunc()
+		_ = stdErr.Close()
+		_ = stdOut.Close()
+		_ = cmd.Wait()
+	}()
+	if err != nil {
+		log.Println(err.Error())
+		return ""
+	}
+	err = cmd.Start()
+
+	if err != nil {
+		log.Println(err.Error())
+		return ""
+	}
+	bytesOut, err := io.ReadAll(stdOut)
+	if err != nil {
+		log.Println(err.Error())
+		return ""
+	}
+	bytesErr, err := io.ReadAll(stdErr)
+	if err != nil {
+		log.Println(err.Error())
+		return ""
+	}
+	if len(bytesErr) != 0 {
+		log.Println(string(bytesErr))
+	}
+	return strings.TrimSpace(string(bytesOut))
 }
 
 func (adbDevice AdbDevice) ShellOutPut(cmd string) string {

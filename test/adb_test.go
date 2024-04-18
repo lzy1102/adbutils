@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/xmsociety/adbutils"
+	"github.com/lzy1102/adbutils"
 )
 
 var adb = adbutils.AdbClient{Host: "localhost", Port: 5037, SocketTime: 10}
@@ -25,4 +25,14 @@ func TestConnect(t *testing.T) {
 		// fmt.Println(adb.Device(snNtid).Push("/Users/sato/Desktop/go-scrcpy-client/scrcpy/scrcpy-server.jar", "/data/local/tmp/scrcpy-server.jar"))
 	}
 
+}
+
+func Test_downloadADB(t *testing.T) {
+	adbutils.AdbPath()
+	adb.Connect("192.168.50.142:5555")
+	for _, i := range adb.DeviceList() {
+		fmt.Println(i.Serial)
+		//fmt.Println(i.StartTCPIP("5555"))
+		// fmt.Println(adb.Device(snNtid).Push("/Users/sato/Desktop/go-scrcpy-client/scrcpy/scrcpy-server.jar", "/data/local/tmp/scrcpy-server.jar"))
+	}
 }

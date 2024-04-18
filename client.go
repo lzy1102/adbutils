@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	_ "github.com/xmsociety/adbutils/binaries"
+	_ "github.com/lzy1102/adbutils/binaries"
+	"github.com/mholt/archiver/v3"
 	"io"
+	"io/fs"
 	"log"
 	"net"
 	"net/http"
@@ -37,10 +39,36 @@ const (
 	Windows         = "windows"
 	Mac             = "darwin"
 	Linux           = "linux"
-	macAdbURL       = "https://cdn.mongona.com/mac/adb"
-	linuxAdbURL     = "https://cdn.mongona.com/linux/adb"
-	WinAdbURL       = "https://cdn.mongona.com/win"
+	macAdbURL       = "https://dl.google.com/android/repository/platform-tools-latest-darwin.zip"
+	linuxAdbURL     = "https://dl.google.com/android/repository/platform-tools-latest-linux.zip"
+	WinAdbURL       = "https://dl.google.com/android/repository/platform-tools-latest-windows.zip"
 )
+
+func Uncompression(src, dst string) error {
+	err := archiver.Unarchive(src, dst)
+	if err != nil {
+		// 处理错误
+		return err
+	}
+	return nil
+}
+
+func Compression(src, dst string) error {
+	var allFile []string
+	filepath.Walk(src, func(path string, info fs.FileInfo, err error) error {
+		if info.IsDir() {
+			return err
+		}
+		allFile = append(allFile, path)
+		return nil
+	})
+	err := archiver.Archive(allFile, dst)
+	if err != nil {
+		// 处理错误
+		return err
+	}
+	return nil
+}
 
 func checkServer(host string, port int) bool {
 	_, err := net.Dial("tcp", fmt.Sprintf("%v:%v", host, port))
@@ -234,7 +262,7 @@ func downloadFile(url string, localPath string, wg *sync.WaitGroup) error {
 		buf     = make([]byte, 32*1024)
 		written int64
 	)
-	tmpFilePath := localPath + ".download"
+	tmpFilePath := localPath
 	client := new(http.Client)
 	resp, err := client.Get(url)
 	if err != nil {
@@ -277,9 +305,9 @@ func downloadFile(url string, localPath string, wg *sync.WaitGroup) error {
 			break
 		}
 	}
-	if err == nil {
-		err = os.Rename(tmpFilePath, localPath)
-	}
+	//if err == nil {
+	//	err = os.Rename(tmpFilePath, localPath)
+	//}
 	return err
 }
 
@@ -308,6 +336,31 @@ func pathExists(path string) (bool, error) {
 		return false, nil
 	}
 	return false, err
+}
+func copyFile(srcPath, dstPath string) error {
+	// 打开源文件
+	srcFile, err := os.Open(srcPath)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+	// 创建目标文件
+	dstFile, err := os.Create(dstPath)
+	if err != nil {
+		return err
+	}
+	defer dstFile.Close()
+	// 将源文件内容复制到目标文件
+	_, err = io.Copy(dstFile, srcFile)
+	if err != nil {
+		return err
+	}
+	// 确保所有内容都已在磁盘上
+	err = dstFile.Sync()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func AdbPath() string {
@@ -339,25 +392,45 @@ func AdbPath() string {
 	}
 	exist, _ = pathExists(adbPath)
 	if !exist {
-		if platform == Windows {
-			AdbWinApiPath, _ := filepath.Abs(path.Join(dir, "AdbWinApi.dll"))
-			AdbWinUsbApiPath, _ := filepath.Abs(path.Join(dir, "AdbWinUsbApi.dll"))
-			wg := &sync.WaitGroup{}
-			wg.Add(3)
-			err = downloadFile(url+"/adb.exe", adbPath, wg)
-			err = downloadFile(url+"/AdbWinApi.dll", AdbWinApiPath, wg)
-			err = downloadFile(url+"/AdbWinUsbApi.dll", AdbWinUsbApiPath, wg)
-			wg.Wait()
-			if err != nil {
-				log.Println("get adb error!", err.Error())
+		os.TempDir()
+		tmp := strings.Split(url, "/")
+		localPath := tmp[len(tmp)-1]
+		fmt.Println(localPath)
+		downloadFile(url, localPath, nil)
+		Uncompression(localPath, "./tmp")
+		filepath.Walk("./tmp", func(path1 string, info fs.FileInfo, err error) error {
+			if info.IsDir() {
+				return nil
 			}
-		} else {
-			err = downloadFile(url, adbPath, nil)
+			abs, err := filepath.Abs(path.Join(dir, info.Name()))
 			if err != nil {
-				log.Println("get adb error!", err.Error())
+				return err
 			}
-			_ = os.Chmod(adbPath, 0777)
-		}
+			copyFile(path1, abs)
+			_ = os.Chmod(abs, 0777)
+			return nil
+		})
+		os.RemoveAll("./tmp")
+		os.RemoveAll(localPath)
+		//if platform == Windows {
+		//	AdbWinApiPath, _ := filepath.Abs(path.Join(dir, "AdbWinApi.dll"))
+		//	AdbWinUsbApiPath, _ := filepath.Abs(path.Join(dir, "AdbWinUsbApi.dll"))
+		//	wg := &sync.WaitGroup{}
+		//	wg.Add(3)
+		//	err = downloadFile(url+"/adb.exe", adbPath, wg)
+		//	err = downloadFile(url+"/AdbWinApi.dll", AdbWinApiPath, wg)
+		//	err = downloadFile(url+"/AdbWinUsbApi.dll", AdbWinUsbApiPath, wg)
+		//	wg.Wait()
+		//	if err != nil {
+		//		log.Println("get adb error!", err.Error())
+		//	}
+		//} else {
+		//	err = downloadFile(url, adbPath, nil)
+		//	if err != nil {
+		//		log.Println("get adb error!", err.Error())
+		//	}
+		//	_ = os.Chmod(adbPath, 0777)
+		//}
 	}
 	return adbPath
 }
@@ -422,7 +495,7 @@ func (adb *AdbClient) Shell(serial string, command string, stream bool) interfac
 }
 
 func (adb *AdbClient) DeviceList() []AdbDevice {
-	res := []AdbDevice{}
+	var res []AdbDevice
 	c := adb.connect()
 	c.SendCommand("host:devices")
 	c.CheckOkay()
