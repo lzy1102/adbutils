@@ -51,7 +51,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/xmsociety/adbutils"
+	"github.com/lzy1102/adbutils"
 )
 
 var adb = adbutils.AdbClient{Host: "localhost", Port: 5037, SocketTime: 10}
@@ -75,7 +75,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/xmsociety/adbutils"
+	"github.com/lzy1102/adbutils"
 )
 adb := adbutils.NewAdb("localhost", 5037, 10)
 
@@ -179,7 +179,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/xmsociety/adbutils"
+	"github.com/lzy1102/adbutils"
 )
 
 // 获取序列号
@@ -280,7 +280,7 @@ Make sure you can connect Github, Now you can edit code in `adbutils` and test w
 ```go
 package test
 import (
-	"github.com/xmsociety/adbutils"
+	"github.com/lzy1102/adbutils"
 	"testing"
 )
 // .... test code here ...
