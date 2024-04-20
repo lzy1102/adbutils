@@ -325,7 +325,7 @@ func createDir(path string) bool {
 	if _exist {
 		return true
 	} else {
-		err := os.Mkdir(path, os.ModePerm)
+		err := os.MkdirAll(path, os.ModePerm)
 		if err != nil {
 			return true
 		}
