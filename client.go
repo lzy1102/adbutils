@@ -390,6 +390,7 @@ func AdbPath() string {
 		url = WinAdbURL
 	}
 	dir, _ := filepath.Abs(path.Join(currentPath, "binaries", subPath))
+	os.MkdirAll(dir, 777)
 	exist, err := pathExists(dir)
 	if err != nil {
 		log.Println(err.Error())
