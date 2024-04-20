@@ -2,6 +2,8 @@ package test
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/lzy1102/adbutils"
@@ -28,11 +30,20 @@ func TestConnect(t *testing.T) {
 }
 
 func Test_downloadADB(t *testing.T) {
-	adbutils.AdbPath()
+	fmt.Println(adbutils.AdbPath())
 	adb.Connect("192.168.50.142:5555")
 	for _, i := range adb.DeviceList() {
 		fmt.Println(i.Serial)
 		//fmt.Println(i.StartTCPIP("5555"))
 		// fmt.Println(adb.Device(snNtid).Push("/Users/sato/Desktop/go-scrcpy-client/scrcpy/scrcpy-server.jar", "/data/local/tmp/scrcpy-server.jar"))
 	}
+}
+
+func Test_path(t *testing.T) {
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	exPath := filepath.Dir(ex)
+	fmt.Println(exPath)
 }
