@@ -421,6 +421,7 @@ func AdbPath() string {
 			if err != nil {
 				return err
 			}
+			fmt.Println("copy file ", abs)
 			copyFile(path1, abs)
 			_ = os.Chmod(abs, 0777)
 			return nil
