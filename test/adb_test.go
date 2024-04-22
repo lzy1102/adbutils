@@ -1,9 +1,11 @@
 package test
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/lzy1102/adbutils"
@@ -46,4 +48,12 @@ func Test_path(t *testing.T) {
 	}
 	exPath := filepath.Dir(ex)
 	fmt.Println(exPath)
+}
+
+func Test_rutier(t *testing.T) {
+	_, file, _, ok := runtime.Caller(1)
+	if !ok {
+		panic(errors.New("Can not get current file info"))
+	}
+	fmt.Println(file)
 }

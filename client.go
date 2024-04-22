@@ -87,11 +87,18 @@ func getParentDirectory(dirctory string) string {
 	return substr(dirctory, 0, strings.LastIndex(dirctory, "/"))
 }
 func getCurrentFile() string {
-	_, file, _, ok := runtime.Caller(1)
-	if !ok {
-		panic(errors.New("Can not get current file info"))
+	//_, file, _, ok := runtime.Caller(1)
+	//if !ok {
+	//	panic(errors.New("Can not get current file info"))
+	//}
+	//return getParentDirectory(file)
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
 	}
-	return getParentDirectory(file)
+	exPath := filepath.Dir(ex)
+	//fmt.Println(exPath)
+	return exPath
 }
 
 func GetFreePort() int {
@@ -372,12 +379,7 @@ func copyFile(srcPath, dstPath string) error {
 func AdbPath() string {
 	// so ugly
 	currentPath := getCurrentFile()
-	//ex, err := os.Executable()
-	//if err != nil {
-	//	panic(err)
-	//}
-	//currentPath := filepath.Dir(ex)
-	fmt.Println(currentPath)
+	fmt.Println("currentPath", currentPath)
 	platform := runtime.GOOS
 	adbPath := ""
 	subPath := "mac"
@@ -405,7 +407,7 @@ func AdbPath() string {
 	}
 	exist, _ = pathExists(adbPath)
 	if !exist {
-		os.TempDir()
+		//os.TempDir()
 		tmp := strings.Split(url, "/")
 		localPath := tmp[len(tmp)-1]
 		fmt.Println(localPath)
