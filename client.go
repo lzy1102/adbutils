@@ -379,7 +379,7 @@ func copyFile(srcPath, dstPath string) error {
 func AdbPath() string {
 	// so ugly
 	currentPath := getCurrentFile()
-	fmt.Println("currentPath", currentPath)
+	//fmt.Println("currentPath", currentPath)
 	platform := runtime.GOOS
 	adbPath := ""
 	subPath := "mac"
