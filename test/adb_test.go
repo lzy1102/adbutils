@@ -57,3 +57,11 @@ func Test_rutier(t *testing.T) {
 	}
 	fmt.Println(file)
 }
+
+func Test_IP(t *testing.T) {
+	fmt.Println(adbutils.AdbPath())
+	//adb.Connect("192.168.50.142:5555")
+	for _, device := range adb.DeviceList() {
+		fmt.Println("ip", device.WlanIp())
+	}
+}

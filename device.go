@@ -83,9 +83,11 @@ func (mixin ShellMixin) SendKeys(text string) {
 func (mixin ShellMixin) escapeSpecialCharacters(text string) {}
 
 func (mixin ShellMixin) WlanIp() string {
-	res := mixin.run("ifconfig wlan0")
-	ipInfo := res.(string)
+	//res := mixin.run("ifconfig wlan0")
+	//ipInfo := res.(string)
 	// TODO regrex
+	res := mixin.run(`ip addr show wlan0 | grep 'inet ' | cut -d' ' -f6 | cut -d/ -f1`)
+	ipInfo := res.(string)
 	return ipInfo
 }
 
