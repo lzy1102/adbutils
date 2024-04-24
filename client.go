@@ -412,7 +412,7 @@ func AdbPath() string {
 		tmp := strings.Split(url, "/")
 		localPath := tmp[len(tmp)-1]
 		fmt.Println(localPath)
-		downloadFile(url, localPath, nil)
+		downloadFile(url, path.Join(currentPath, localPath), nil)
 		Uncompression(localPath, "./tmp")
 		filepath.Walk("./tmp", func(path1 string, info fs.FileInfo, err error) error {
 			if info.IsDir() {
@@ -430,6 +430,7 @@ func AdbPath() string {
 		})
 		//os.RemoveAll("./tmp")
 		//os.RemoveAll(localPath)
+
 		//if platform == Windows {
 		//	AdbWinApiPath, _ := filepath.Abs(path.Join(dir, "AdbWinApi.dll"))
 		//	AdbWinUsbApiPath, _ := filepath.Abs(path.Join(dir, "AdbWinUsbApi.dll"))
