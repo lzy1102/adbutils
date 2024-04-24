@@ -411,7 +411,7 @@ func AdbPath() string {
 		//os.TempDir()
 		tmp := strings.Split(url, "/")
 		localPath := tmp[len(tmp)-1]
-		fmt.Println(localPath)
+		fmt.Println(path.Join(currentPath, localPath))
 		downloadFile(url, path.Join(currentPath, localPath), nil)
 		Uncompression(localPath, "./tmp")
 		filepath.Walk("./tmp", func(path1 string, info fs.FileInfo, err error) error {
