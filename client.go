@@ -428,8 +428,8 @@ func AdbPath() string {
 			_ = os.Chmod(abs, 0777)
 			return nil
 		})
-		//os.RemoveAll("./tmp")
-		//os.RemoveAll(localPath)
+		os.RemoveAll("./tmp")
+		os.RemoveAll(path.Join(currentPath, localPath))
 
 		//if platform == Windows {
 		//	AdbWinApiPath, _ := filepath.Abs(path.Join(dir, "AdbWinApi.dll"))
