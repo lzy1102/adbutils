@@ -420,6 +420,7 @@ func AdbPath() string {
 			}
 			abs, err := filepath.Abs(path.Join(dir, info.Name()))
 			if err != nil {
+				fmt.Println("abs err", err)
 				return err
 			}
 			fmt.Println("copy file ", abs)
@@ -427,8 +428,8 @@ func AdbPath() string {
 			_ = os.Chmod(abs, 0777)
 			return nil
 		})
-		os.RemoveAll("./tmp")
-		os.RemoveAll(localPath)
+		//os.RemoveAll("./tmp")
+		//os.RemoveAll(localPath)
 		//if platform == Windows {
 		//	AdbWinApiPath, _ := filepath.Abs(path.Join(dir, "AdbWinApi.dll"))
 		//	AdbWinUsbApiPath, _ := filepath.Abs(path.Join(dir, "AdbWinUsbApi.dll"))
