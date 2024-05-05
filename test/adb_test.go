@@ -18,6 +18,21 @@ func TestServerVersion(t *testing.T) {
 	t.Logf("version: %d", version)
 }
 
+func Test_forward(t *testing.T) {
+	//adb.Shell("38ebb830", "forward tcp:12345 tcp:8080", false)
+	for _, device := range adb.DeviceList() {
+		fmt.Println(device.ForWard("tcp:12345", "tcp:8080", false))
+		fmt.Println(device.Serial, device.ForwardList())
+		fmt.Println(device.SayHello())
+		//fmt.Println(device.Client.Shell(device.Serial, "forward tcp:12345 tcp:8080", false))
+	}
+
+	//device := adb.Device(adbutils.SerialNTransportID{Serial: "38ebb830"})
+	//list := device.ForwardList()
+	//fmt.Println(list)
+	//fmt.Println(device.ForWardPort("8080"))
+}
+
 func TestConnect(t *testing.T) {
 	// adb := adbutils.NewAdb("localhost", 5037, 10)
 	for _, i := range adb.DeviceList() {

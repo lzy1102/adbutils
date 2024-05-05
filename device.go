@@ -178,6 +178,8 @@ func (mixin ShellMixin) Remove(path string) {
 
 func (mixin ShellMixin) openTransport(command string, timeOut time.Duration) *AdbConnection {
 	c := mixin.Client.connect()
+	//fmt.Println("connect device success")
+	//fmt.Println(command)
 	if timeOut > 0 {
 		// 这里修改了一下 使用c设置Conn的timeout
 		err := c.SetTimeout(timeOut)
@@ -187,10 +189,12 @@ func (mixin ShellMixin) openTransport(command string, timeOut time.Duration) *Ad
 	}
 	if command != "" {
 		if mixin.TransportID > 0 {
+			//fmt.Println(command)
 			c.SendCommand("host-transport-id:" + fmt.Sprintf("%d:%s", mixin.TransportID, command))
 			//  send_command(f"host-transport-id:{self._transport_id}:{command}")
 		} else if mixin.Serial != "" {
 			cmd := "host-serial:" + fmt.Sprintf("%s:%s", mixin.Serial, command)
+			//fmt.Println(cmd)
 			c.SendCommand(cmd)
 			// c.send_command(f"host-serial:{self._serial}:{command}")
 		} else {
@@ -354,12 +358,12 @@ func (adbDevice AdbDevice) ShellOutPut(cmd string) string {
 }
 
 func (adbDevice AdbDevice) ForWard(local, remote string, noRebind bool) *AdbConnection {
-	args := []string{"forward"}
+	args := []string{"forward:"}
 	if noRebind {
-		args = append(args, "norebind")
+		args = append(args, "norebind:")
 	}
 	args = append(args, []string{local, ";", remote}...)
-	return adbDevice.openTransport(strings.Join(args, ":"), adbDevice.Client.SocketTime)
+	return adbDevice.openTransport(strings.Join(args, ""), adbDevice.Client.SocketTime)
 }
 
 func (adbDevice AdbDevice) ForWardPort(remote interface{}) int {
@@ -386,7 +390,7 @@ func (adbDevice AdbDevice) ForWardPort(remote interface{}) int {
 func (adbDevice AdbDevice) ForwardList() []ForwardItem {
 	c := adbDevice.openTransport("list-forward", adbDevice.Client.SocketTime)
 	content := c.ReadStringBlock()
-	forwardItems := []ForwardItem{}
+	var forwardItems []ForwardItem
 	for _, line := range strings.Split(content, "\n") {
 		parts := strings.TrimSpace(line)
 		if len(parts) != 3 {
