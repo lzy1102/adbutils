@@ -22,7 +22,7 @@ func TestServerVersion(t *testing.T) {
 func Test_startApp(t *testing.T) {
 	for _, device := range adb.DeviceList() {
 		fmt.Println(device.Serial)
-		device.AppStart("com.amazon.mShop.android.shopping", "com.amazon.mShop.home.HomeActivity")
+		device.AppStart("com.amazon.mShop.android.shopping", "")
 		time.Sleep(10 * time.Second)
 	}
 }

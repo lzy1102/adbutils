@@ -143,7 +143,8 @@ func (mixin ShellMixin) AppStart(packageName, activity string) {
 	if activity != "" {
 		mixin.run("am start -n " + packageName + "/" + activity)
 	} else {
-		mixin.run("monkey -p " + packageName + "-c" + "android.intent.category.LAUNCHER 1")
+		//mixin.run("android.intent.category.LAUNCHER 1")
+		mixin.run("monkey -p " + packageName + " -c " + "android.intent.category.LAUNCHER 1")
 	}
 }
 
