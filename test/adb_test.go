@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/lzy1102/adbutils"
 )
@@ -16,6 +17,14 @@ var adb = adbutils.AdbClient{Host: "localhost", Port: 5037, SocketTime: 10}
 func TestServerVersion(t *testing.T) {
 	version := adb.ServerVersion()
 	t.Logf("version: %d", version)
+}
+
+func Test_startApp(t *testing.T) {
+	for _, device := range adb.DeviceList() {
+		fmt.Println(device.Serial)
+		device.AppStart("com.amazon.mShop.android.shopping", "com.amazon.mShop.home.HomeActivity")
+		time.Sleep(10 * time.Second)
+	}
 }
 
 func Test_forward(t *testing.T) {

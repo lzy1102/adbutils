@@ -23,6 +23,7 @@ type ShellMixin struct {
 }
 
 func (mixin ShellMixin) run(cmd string) interface{} {
+	fmt.Println("cmd ", cmd)
 	return mixin.Client.Shell(mixin.Serial, cmd, false)
 }
 

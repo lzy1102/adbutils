@@ -16,7 +16,7 @@ func TestPackAndUnpack(t *testing.T) {
 }
 
 func TestPackAndUnpackMuti(t *testing.T) {
-	bytes := []byte{}
+	var bytes []byte
 	for i := 0; i <= 3; i++ {
 		bs := make([]byte, 4)
 		binary.LittleEndian.PutUint32(bs, uint32(5))
