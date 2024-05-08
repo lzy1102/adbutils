@@ -213,6 +213,7 @@ func (adbConnection AdbConnection) readFully(n int) []byte {
 
 func (adbConnection AdbConnection) SendCommand(cmd string) {
 	msg := fmt.Sprintf("%04x%s", len(cmd), cmd)
+	fmt.Println(msg)
 	_, err := adbConnection.Conn.Write([]byte(msg))
 	if err != nil {
 		log.Println("write error!", err.Error())

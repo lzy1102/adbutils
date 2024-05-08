@@ -3,6 +3,7 @@ package test
 import (
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -22,17 +23,78 @@ func TestServerVersion(t *testing.T) {
 func Test_startApp(t *testing.T) {
 	for _, device := range adb.DeviceList() {
 		fmt.Println(device.Serial)
-		device.AppStart("com.amazon.mShop.android.shopping", "")
+		device.AppStart("com.test.shopping", "")
 		time.Sleep(10 * time.Second)
+		device.KeyEvent("KEYCODE_VOLUME_UP")
+		//device.SendKeys()
 	}
+}
+
+func Test_socketWrite(t *testing.T) {
+	conn, err := net.Dial("tcp", "localhost:5037")
+	if err != nil {
+		fmt.Println("Failed to connect to ADB:", err)
+		return
+	}
+	defer conn.Close()
+	fmt.Println("连接成功")
+	cmd := "host:tport:serial:HT84V1A01758"
+	msg := fmt.Sprintf("%04x%s", len(cmd), cmd)
+	fmt.Println(msg)
+	_, err = conn.Write([]byte(msg))
+	if err != nil {
+		fmt.Println("Failed to send command to ADB:", err)
+		return
+	}
+	fmt.Println("写入成功")
+	buf := make([]byte, 1024)
+	n, err := conn.Read(buf)
+	if err != nil {
+		fmt.Println("Failed to read from ADB:", err)
+		return
+	}
+	fmt.Println("返回长度 ", n)
+	fmt.Println(string(buf[:n]))
+
+	cmd = "reverse:forward:tcp:5000;tcp:5000"
+	msg = fmt.Sprintf("%04x%s", len(cmd), cmd)
+	fmt.Println(msg)
+	_, err = conn.Write([]byte(msg))
+	if err != nil {
+		fmt.Println("Failed to send command to ADB:", err)
+		return
+	}
+	fmt.Println("写入成功")
+	buf = make([]byte, 1024)
+	n, err = conn.Read(buf)
+	if err != nil {
+		fmt.Println("Failed to read from ADB:", err)
+		return
+	}
+	fmt.Println("返回长度 ", n)
+	fmt.Println(string(buf[:n]))
+	time.Sleep(time.Second * 100)
+}
+
+func Test_reverse(t *testing.T) {
+	fmt.Println(fmt.Sprintf("%04x", len("host-serial:HT84V1A01758:reverse:tcp:5000;tcp:5000")))
+	for _, device := range adb.DeviceList() {
+		fmt.Println(device.Serial)
+		fmt.Println(device.Client.ServerVersion())
+		fmt.Println(device.Reverse("tcp:5000", "tcp:5000", false))
+		//device.Shell("reverse tcp:5000 tcp:5000", false, 10)
+
+	}
+	//adb.Device(adbutils.SerialNTransportID{Serial: "HT84V1A01758"}).Reverse("tcp:5000", "tcp:5000", false)
 }
 
 func Test_forward(t *testing.T) {
 	//adb.Shell("38ebb830", "forward tcp:12345 tcp:8080", false)
 	for _, device := range adb.DeviceList() {
-		fmt.Println(device.ForWard("tcp:12345", "tcp:8080", false))
-		fmt.Println(device.Serial, device.ForwardList())
-		fmt.Println(device.SayHello())
+		fmt.Println(device.ForWard("tcp:8766", "tcp:8766", false))
+		//fmt.Println(device.Serial, device.ForwardList())
+		//fmt.Println(device.SayHello())
+
 		//fmt.Println(device.Client.Shell(device.Serial, "forward tcp:12345 tcp:8080", false))
 	}
 

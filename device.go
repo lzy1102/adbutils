@@ -196,13 +196,17 @@ func (mixin ShellMixin) openTransport(command string, timeOut time.Duration) *Ad
 			//  send_command(f"host-transport-id:{self._transport_id}:{command}")
 		} else if mixin.Serial != "" {
 			cmd := "host-serial:" + fmt.Sprintf("%s:%s", mixin.Serial, command)
-			//fmt.Println(cmd)
 			c.SendCommand(cmd)
-			// c.send_command(f"host-serial:{self._serial}:{command}")
+			//c.send_command(f"host-serial:{self._serial}:{command}")
+			//cmd := "host:tport:serial:" + mixin.Serial
+			//c.SendCommand(cmd)
+			//c.CheckOkay()
+			//c.SendCommand(command)
 		} else {
 			log.Println("RuntimeError")
 		}
 		c.CheckOkay()
+		//c.CheckOkay()
 	} else {
 		if mixin.TransportID > 0 {
 			c.SendCommand("host:transport-id:" + fmt.Sprintf("%d", mixin.TransportID))
@@ -213,6 +217,12 @@ func (mixin ShellMixin) openTransport(command string, timeOut time.Duration) *Ad
 			// # so here use host:transport
 			c.SendCommand("host:transport:" + mixin.Serial)
 			// c.send_command(f"host:transport:{self._serial}")
+			//c.send_command(f"host:tport:serial:{self._serial}")
+			//c.check_okay()
+			//c.read(8)  # skip 8 bytes
+			//c.SendCommand("host:tport:serial:" + mixin.Serial)
+			//c.CheckOkay()
+			//c.Read(8)
 		} else {
 			log.Println("RuntimeError")
 		}
@@ -365,7 +375,28 @@ func (adbDevice AdbDevice) ForWard(local, remote string, noRebind bool) *AdbConn
 		args = append(args, "norebind:")
 	}
 	args = append(args, []string{local, ";", remote}...)
+	//c := adbDevice.openTransport("", adbDevice.Client.SocketTime)
+	//c.SendCommand(strings.Join(args, ""))
+	//c.CheckOkay()
+	//c.CheckOkay()
+	//return c
 	return adbDevice.openTransport(strings.Join(args, ""), adbDevice.Client.SocketTime)
+}
+
+func (adbDevice AdbDevice) Reverse(local, remote string, noRebind bool) *AdbConnection {
+	args := []string{"reverse:forward:"}
+	if noRebind {
+		args = append(args, "norebind:")
+	}
+	args = append(args, []string{local, ";", remote}...)
+
+	c := adbDevice.openTransport("", adbDevice.Client.SocketTime)
+	c.SendCommand(strings.Join(args, ""))
+	c.CheckOkay()
+	c.CheckOkay()
+	return c
+	//adbDevice.openTransport("", adbDevice.Client.SocketTime)
+	//return adbDevice.openTransport(strings.Join(args, ""), adbDevice.Client.SocketTime)
 }
 
 func (adbDevice AdbDevice) ForWardPort(remote interface{}) int {
@@ -484,14 +515,14 @@ func (sync Sync) IterDirectory(path string) []FileInfo {
 	if err != nil {
 		log.Println("get file list error ", err.Error())
 	}
-	fileInfos := []FileInfo{}
+	var fileInfos []FileInfo
 	for {
 		response := c.ReadString(4)
 		if response == DONE {
 			break
 		}
 		fileInfo := FileInfo{}
-		res := []uint32{}
+		var res []uint32
 		for i := 0; i < 4; i++ {
 			res = append(res, binary.LittleEndian.Uint32(c.Read(4)))
 		}
@@ -568,7 +599,7 @@ func (sync Sync) IterContent(path string) []byte {
 	if err != nil {
 		log.Println("IterContent error ", err.Error())
 	}
-	chunks := []byte{}
+	var chunks []byte
 	for {
 		cmd := c.ReadString(4)
 		switch cmd {
