@@ -77,13 +77,10 @@ func Test_socketWrite(t *testing.T) {
 }
 
 func Test_reverse(t *testing.T) {
-	fmt.Println(fmt.Sprintf("%04x", len("host-serial:HT84V1A01758:reverse:tcp:5000;tcp:5000")))
+	//fmt.Println(fmt.Sprintf("%04x", len("host-serial:HT84V1A01758:reverse:tcp:5000;tcp:5000")))
 	for _, device := range adb.DeviceList() {
 		fmt.Println(device.Serial)
-		fmt.Println(device.Client.ServerVersion())
 		fmt.Println(device.Reverse("tcp:5000", "tcp:5000", false))
-		//device.Shell("reverse tcp:5000 tcp:5000", false, 10)
-
 	}
 	//adb.Device(adbutils.SerialNTransportID{Serial: "HT84V1A01758"}).Reverse("tcp:5000", "tcp:5000", false)
 }

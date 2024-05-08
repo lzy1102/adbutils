@@ -393,7 +393,7 @@ func (adbDevice AdbDevice) Reverse(local, remote string, noRebind bool) *AdbConn
 	c := adbDevice.openTransport("", adbDevice.Client.SocketTime)
 	c.SendCommand(strings.Join(args, ""))
 	c.CheckOkay()
-	c.CheckOkay()
+	//c.CheckOkay()
 	return c
 	//adbDevice.openTransport("", adbDevice.Client.SocketTime)
 	//return adbDevice.openTransport(strings.Join(args, ""), adbDevice.Client.SocketTime)
