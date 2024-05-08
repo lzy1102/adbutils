@@ -194,6 +194,7 @@ func (mixin ShellMixin) openTransport(command string, timeOut time.Duration) *Ad
 			//fmt.Println(command)
 			c.SendCommand("host-transport-id:" + fmt.Sprintf("%d:%s", mixin.TransportID, command))
 			//  send_command(f"host-transport-id:{self._transport_id}:{command}")
+			c.CheckOkay()
 		} else if mixin.Serial != "" {
 			cmd := "host-serial:" + fmt.Sprintf("%s:%s", mixin.Serial, command)
 			c.SendCommand(cmd)
@@ -202,31 +203,35 @@ func (mixin ShellMixin) openTransport(command string, timeOut time.Duration) *Ad
 			//c.SendCommand(cmd)
 			//c.CheckOkay()
 			//c.SendCommand(command)
+			c.CheckOkay()
 		} else {
 			log.Println("RuntimeError")
 		}
-		c.CheckOkay()
+
 		//c.CheckOkay()
 	} else {
 		if mixin.TransportID > 0 {
 			c.SendCommand("host:transport-id:" + fmt.Sprintf("%d", mixin.TransportID))
 			// c.send_command(f"host:transport-id:{self._transport_id}")
+			c.CheckOkay()
 		} else if mixin.Serial != "" {
 			// # host:tport:serial:xxx is also fine, but receive 12 bytes
 			// # recv: 4f 4b 41 59 14 00 00 00 00 00 00 00              OKAY........
 			// # so here use host:transport
-			c.SendCommand("host:transport:" + mixin.Serial)
-			// c.send_command(f"host:transport:{self._serial}")
+			//c.SendCommand("host:transport:" + mixin.Serial)
+
+			//# host:tport:serial:xxx is also fine, but receive 12 bytes
+			//# recv: 4f 4b 41 59 14 00 00 00 00 00 00 00              OKAY........
 			//c.send_command(f"host:tport:serial:{self._serial}")
 			//c.check_okay()
 			//c.read(8)  # skip 8 bytes
-			//c.SendCommand("host:tport:serial:" + mixin.Serial)
-			//c.CheckOkay()
-			//c.Read(8)
+			c.SendCommand(fmt.Sprintf("host:tport:serial:%s", mixin.Serial))
+			c.CheckOkay()
+			c.Read(8)
 		} else {
 			log.Println("RuntimeError")
 		}
-		c.CheckOkay()
+
 	}
 	return c
 }
@@ -393,7 +398,7 @@ func (adbDevice AdbDevice) Reverse(local, remote string, noRebind bool) *AdbConn
 	c := adbDevice.openTransport("", adbDevice.Client.SocketTime)
 	c.SendCommand(strings.Join(args, ""))
 	c.CheckOkay()
-	//c.CheckOkay()
+	c.CheckOkay()
 	return c
 	//adbDevice.openTransport("", adbDevice.Client.SocketTime)
 	//return adbDevice.openTransport(strings.Join(args, ""), adbDevice.Client.SocketTime)
