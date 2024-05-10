@@ -85,13 +85,16 @@ func (mixin ShellMixin) SendKeys(text string) {
 func (mixin ShellMixin) escapeSpecialCharacters(text string) {}
 
 func (mixin ShellMixin) WlanIp() string {
-	res := mixin.run("ifconfig wlan0")
+	//res := mixin.run("ifconfig wlan0")
+	res := mixin.run("ip addr show wlan0|grep 'inet '| cut -d' ' -f6 | cut -d/ -f1")
 	ipInfo := res.(string)
+	fmt.Println(ipInfo)
+	return ipInfo
 	//return ipInfo
 	// TODO regrex
 	re := regexp.MustCompile(`(?:\d{1,3}\.){3}\d{1,3}`) // 匹配 IPv4 地址的正则表达式
 	match := re.FindString(ipInfo)
-	//fmt.Println(match) // 输出: 192.168.50.130
+	fmt.Println(match) // 输出: 192.168.50.130
 	return match
 	//res := mixin.run(`ip addr show wlan0 | grep 'inet ' | cut -d' ' -f6 | cut -d/ -f1`)
 	//ipInfo := res.(string)
