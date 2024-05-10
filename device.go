@@ -437,9 +437,11 @@ func (adbDevice AdbDevice) ForWardPort(remote interface{}) int {
 func (adbDevice AdbDevice) ForwardList() []ForwardItem {
 	c := adbDevice.openTransport("list-forward", adbDevice.Client.SocketTime)
 	content := c.ReadStringBlock()
+	//fmt.Println(content)
 	var forwardItems []ForwardItem
 	for _, line := range strings.Split(content, "\n") {
-		parts := strings.TrimSpace(line)
+		parts := strings.Split(strings.TrimSpace(line), " ")
+		//fmt.Println(parts)
 		if len(parts) != 3 {
 			continue
 		} else {

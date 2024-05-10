@@ -85,6 +85,13 @@ func Test_reverse(t *testing.T) {
 	//adb.Device(adbutils.SerialNTransportID{Serial: "HT84V1A01758"}).Reverse("tcp:5000", "tcp:5000", false)
 }
 
+func Test_forwardlist(t *testing.T) {
+	forlist := adb.Device(adbutils.SerialNTransportID{Serial: "HT84V1A01758"}).ForwardList()
+	for _, item := range forlist {
+		fmt.Println(item)
+	}
+}
+
 func Test_forward(t *testing.T) {
 	//adb.Shell("38ebb830", "forward tcp:12345 tcp:8080", false)
 	for _, device := range adb.DeviceList() {
