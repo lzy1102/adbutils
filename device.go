@@ -138,6 +138,20 @@ func (mixin ShellMixin) ListPackages() []string {
 	return result
 }
 
+func (mixin ShellMixin) ListPackages3() []string {
+	var result []string
+	res := mixin.run("pm list packages -3")
+	output := res.(string)
+	for _, packageName := range strings.Split(output, "\n") {
+		p := strings.TrimSpace(strings.TrimPrefix(packageName, "package:"))
+		if p == "" {
+			continue
+		}
+		result = append(result, p)
+	}
+	return result
+}
+
 func (mixin ShellMixin) PackageInfo(packageName string) {
 	// TODO
 }

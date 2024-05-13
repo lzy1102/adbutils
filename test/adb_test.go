@@ -15,6 +15,15 @@ import (
 
 var adb = adbutils.AdbClient{Host: "localhost", Port: 5037, SocketTime: 10}
 
+func Test_packages(t *testing.T) {
+	device := adb.Device(adbutils.SerialNTransportID{Serial: "HT84V1A01758"})
+	packages := device.ListPackages3()
+	for k, v := range packages {
+		fmt.Println(k, v)
+		device.PackageInfo(v)
+	}
+}
+
 func TestServerVersion(t *testing.T) {
 	version := adb.ServerVersion()
 	t.Logf("version: %d", version)
