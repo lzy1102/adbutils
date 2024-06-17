@@ -135,7 +135,7 @@ func (adbConnection AdbConnection) safeConnect() (*net.Conn, error) {
 			}
 			err = cmd.Wait()
 			if err != nil {
-				log.Println("start adb error: ", err.Error())
+				log.Println("wait adb error: ", err.Error())
 				return nil, err
 			}
 			conn, err = adbConnection.createSocket()
