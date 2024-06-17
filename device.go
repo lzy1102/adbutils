@@ -202,7 +202,10 @@ func (mixin ShellMixin) Remove(path string) {
 }
 
 func (mixin ShellMixin) openTransport(command string, timeOut time.Duration) *AdbConnection {
-	c := mixin.Client.connect()
+	c, err := mixin.Client.connect()
+	if err != nil {
+		return nil
+	}
 	//fmt.Println("connect device success")
 	//fmt.Println(command)
 	if timeOut > 0 {
