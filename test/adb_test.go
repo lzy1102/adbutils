@@ -15,6 +15,15 @@ import (
 
 var adb = adbutils.AdbClient{Host: "localhost", Port: 5037, SocketTime: 10}
 
+//var adb = adbutils.NewAdb()
+
+func Test_listErr(t *testing.T) {
+	for {
+		fmt.Println(adb.DeviceList())
+		time.Sleep(time.Second * 10)
+	}
+}
+
 func Test_packages(t *testing.T) {
 	device := adb.Device(adbutils.SerialNTransportID{Serial: "HT84V1A01758"})
 	packages := device.ListPackages3()
